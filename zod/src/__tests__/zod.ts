@@ -33,10 +33,14 @@ describe('zodResolver', () => {
   });
 
   it('should return a single error from zodResolver when validation fails', async () => {
-    const result = await zodResolver(schema)(invalidData, undefined, {
-      fields,
-      shouldUseNativeValidation,
-    });
+    const result = await zodResolver(schema)(
+      invalidData as unknown as any,
+      undefined,
+      {
+        fields,
+        shouldUseNativeValidation,
+      },
+    );
 
     expect(result).toMatchSnapshot();
   });
@@ -47,7 +51,10 @@ describe('zodResolver', () => {
 
     const result = await zodResolver(schema, undefined, {
       mode: 'sync',
-    })(invalidData, undefined, { fields, shouldUseNativeValidation });
+    })(invalidData as unknown as any, undefined, {
+      fields,
+      shouldUseNativeValidation,
+    });
 
     expect(parseSpy).toHaveBeenCalledTimes(1);
     expect(parseAsyncSpy).not.toHaveBeenCalled();
@@ -55,18 +62,22 @@ describe('zodResolver', () => {
   });
 
   it('should return all the errors from zodResolver when validation fails with `validateAllFieldCriteria` set to true', async () => {
-    const result = await zodResolver(schema)(invalidData, undefined, {
-      fields,
-      criteriaMode: 'all',
-      shouldUseNativeValidation,
-    });
+    const result = await zodResolver(schema)(
+      invalidData as unknown as any,
+      undefined,
+      {
+        fields,
+        criteriaMode: 'all',
+        shouldUseNativeValidation,
+      },
+    );
 
     expect(result).toMatchSnapshot();
   });
 
   it('should return all the errors from zodResolver when validation fails with `validateAllFieldCriteria` set to true and `mode: sync`', async () => {
     const result = await zodResolver(schema, undefined, { mode: 'sync' })(
-      invalidData,
+      invalidData as unknown as any,
       undefined,
       {
         fields,

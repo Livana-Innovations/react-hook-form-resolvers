@@ -1,6 +1,7 @@
 import { toNestErrors, validateFieldsNatively } from '@hookform/resolvers';
+import { Parameters } from '@sinclair/typebox';
 import { FieldError, FieldErrors, appendErrors } from 'react-hook-form';
-import { ZodError, z } from 'zod';
+import { ZodError, ZodType, z } from 'zod';
 import type { Resolver } from './types';
 
 const isZodError = (error: any): error is ZodError =>
@@ -56,13 +57,24 @@ const parseErrorSchema = (
   return errors;
 };
 
-export const zodResolver: Resolver =
-  (schema, schemaOptions, resolverOptions = {}) =>
-  async (values, _, options) => {
+export function zodResolver<T extends ZodType>(
+  schema: T,
+  schemaOptions?: Partial<z.ParseParams>,
+  resolverOptions: Parameters<Resolver<T>>[2] = {},
+): ReturnType<Resolver<T>> {
+  return async (
+    values: Parameters<ReturnType<Resolver<T>>>[0],
+    _: any,
+    options: Parameters<ReturnType<Resolver<T>>>[2],
+  ) => {
     try {
-      const data = await schema[
-        resolverOptions.mode === 'sync' ? 'parse' : 'parseAsync'
-      ](values, schemaOptions);
+      const data: z.infer<T> = await (async function () {
+        if (resolverOptions.mode === 'sync') {
+          return schema.parse(values, schemaOptions);
+        } else {
+          return schema.parseAsync(values, schemaOptions);
+        }
+      })();
 
       options.shouldUseNativeValidation && validateFieldsNatively({}, options);
 
@@ -88,3 +100,4 @@ export const zodResolver: Resolver =
       throw error;
     }
   };
+}

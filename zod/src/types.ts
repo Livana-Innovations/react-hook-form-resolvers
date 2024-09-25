@@ -1,7 +1,7 @@
-import { FieldValues, ResolverOptions, ResolverResult } from 'react-hook-form';
-import { z } from 'zod';
+import { ResolverOptions, ResolverResult } from 'react-hook-form';
+import { ZodType, z } from 'zod';
 
-export type Resolver = <T extends z.Schema<any, any>>(
+export type Resolver<T extends ZodType> = (
   schema: T,
   schemaOptions?: Partial<z.ParseParams>,
   factoryOptions?: {
@@ -15,8 +15,8 @@ export type Resolver = <T extends z.Schema<any, any>>(
      */
     raw?: boolean;
   },
-) => <TFieldValues extends FieldValues, TContext>(
-  values: TFieldValues,
+) => <TFieldValues extends z.infer<T>, TContext>(
+  values: z.input<T>,
   context: TContext | undefined,
   options: ResolverOptions<TFieldValues>,
 ) => Promise<ResolverResult<TFieldValues>>;
