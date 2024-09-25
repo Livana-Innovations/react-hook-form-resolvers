@@ -31,4 +31,4 @@ dist
 package-lock.json
 .history
 
-!zod/dist/*
+!zod/dist
